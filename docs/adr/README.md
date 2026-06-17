@@ -15,6 +15,7 @@
 | [0004](0004-double-entry-ledger-for-money-movement.md) | 모든 자금 이동은 복식부기 원장으로 | Accepted |
 | [0005](0005-pessimistic-locking-for-funding-concurrency.md) | 펀딩 동시성에 비관적 락 사용 | Accepted |
 | [0006](0006-money-value-object-with-bigdecimal.md) | 금액은 BigDecimal 기반 Money VO로 | Accepted |
+| [0007](0007-idempotent-append-only-ledger-writes.md) | 멱등한 append-only 원장 기록 | Accepted |
 
 ## 새 ADR 추가 방법
 

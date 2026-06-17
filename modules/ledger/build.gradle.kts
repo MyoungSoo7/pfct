@@ -1,6 +1,9 @@
-// ledger: 계정계(복식부기 원장). Phase A는 도메인만. JPA 어댑터는 Phase B에서 추가.
+// ledger: 계정계(복식부기 원장). domain 은 순수 코틀린, adapter 만 JPA 사용.
 plugins {
     kotlin("jvm")
+    kotlin("plugin.spring")
+    kotlin("plugin.jpa")
+    id("io.spring.dependency-management")
 }
 
 java {
@@ -9,11 +12,18 @@ java {
     }
 }
 
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.boot:spring-boot-dependencies:3.5.15")
+    }
+}
+
 dependencies {
     implementation(project(":common"))
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
     testImplementation(kotlin("test-junit5"))
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.11.4")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 kotlin {

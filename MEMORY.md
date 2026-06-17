@@ -15,6 +15,7 @@
 | 2026-06-18 | [0004](docs/adr/0004-double-entry-ledger-for-money-movement.md) | 모든 자금 이동은 복식부기 원장(차변=대변 불변식) |
 | 2026-06-18 | [0005](docs/adr/0005-pessimistic-locking-for-funding-concurrency.md) | 펀딩 동시성은 비관적 락(SELECT … FOR UPDATE) |
 | 2026-06-18 | [0006](docs/adr/0006-money-value-object-with-bigdecimal.md) | 금액은 BigDecimal 기반 Money VO, 이자율은 AnnualInterestRate VO |
+| 2026-06-18 | [0007](docs/adr/0007-idempotent-append-only-ledger-writes.md) | 원장은 append-only, 거래 ID를 멱등 키로(check-first + PK 백스톱), 잔액은 Σ분개로 도출 |
 
 ## 변하지 않는 규칙 (Conventions)
 
