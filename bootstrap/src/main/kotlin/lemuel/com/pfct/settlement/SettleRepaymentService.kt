@@ -9,8 +9,12 @@ import lemuel.com.pfct.ledger.domain.EntryDirection
 import lemuel.com.pfct.ledger.domain.JournalEntry
 import lemuel.com.pfct.ledger.domain.LedgerTransaction
 import lemuel.com.pfct.ledger.domain.TransactionId
+import com.fasterxml.jackson.databind.ObjectMapper
+import lemuel.com.pfct.event.InvestorDistribution
+import lemuel.com.pfct.event.RepaymentSettledEvent
 import lemuel.com.pfct.lending.application.LoanRepository
 import lemuel.com.pfct.lending.domain.LoanId
+import lemuel.com.pfct.outbox.OutboxRecorder
 import lemuel.com.pfct.settlement.domain.ProRataDistributor
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -32,6 +36,8 @@ class SettleRepaymentService(
     private val loans: LoanRepository,
     private val investments: InvestmentRepository,
     private val ledger: RecordLedgerTransactionService,
+    private val outbox: OutboxRecorder,
+    private val objectMapper: ObjectMapper,
 ) {
     @Transactional
     fun settle(command: SettleRepaymentCommand): SettlementResult {
@@ -59,19 +65,33 @@ class SettleRepaymentService(
             }
         }
 
+        val settlementId = "settle:${command.loanId}:${command.sequence}"
+        val distributions = shares.mapIndexed { i, s -> s.investorId.value to amounts[i] }
         val result = ledger.record(
             LedgerTransaction.of(
-                id = TransactionId("settle:${command.loanId}:${command.sequence}"),
+                id = TransactionId(settlementId),
                 description = "상환 정산 loan=${command.loanId} 회차=${command.sequence}",
                 entries = entries,
             ),
         )
 
+        // 실제 반영된 경우에만 정산 이벤트를 아웃박스에 적재(원장 기록과 같은 트랜잭션) → CQRS 읽기 모델 갱신 트리거.
+        if (result.applied) {
+            val event = RepaymentSettledEvent(
+                settlementId = settlementId,
+                loanId = command.loanId,
+                distributions = distributions
+                    .filter { (_, amount) -> amount.isPositive() }
+                    .map { (investorId, amount) -> InvestorDistribution(investorId, amount.amount.longValueExact()) },
+            )
+            outbox.record("Settlement", settlementId, "RepaymentSettled", objectMapper.writeValueAsString(event))
+        }
+
         return SettlementResult(
             loanId = command.loanId,
             sequence = command.sequence,
             fee = fee,
-            distributions = shares.mapIndexed { i, s -> s.investorId.value to amounts[i] },
+            distributions = distributions,
             applied = result.applied,
         )
     }

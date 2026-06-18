@@ -20,6 +20,7 @@
 | 2026-06-18 | [0009](docs/adr/0009-transactional-outbox-for-event-publishing.md) | 이벤트는 트랜잭셔널 아웃박스(상태 변경과 같은 tx 적재 → 릴레이 발행, at-least-once) |
 | 2026-06-18 | [0010](docs/adr/0010-pro-rata-settlement-largest-remainder.md) | 정산은 개별 투자 내역 기반 최대 잉여 비율 분배(합 보존) + 이자 수수료 + 원장 기록(멱등) |
 | 2026-06-18 | [0011](docs/adr/0011-kafka-as-event-transport.md) | 이벤트 전송은 Kafka(KafkaEventPublisher @Primary, 토픽 pfct.outbox, 키=aggregateId, at-least-once) |
+| 2026-06-18 | [0012](docs/adr/0012-cqrs-read-model-via-events.md) | 투자자 수익은 CQRS 읽기 모델(정산 이벤트 → 프로젝터 → investor_return_view, processed_event로 멱등) |
 
 ## 변하지 않는 규칙 (Conventions)
 

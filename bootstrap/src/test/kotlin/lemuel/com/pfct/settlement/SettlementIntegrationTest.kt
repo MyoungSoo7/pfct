@@ -44,6 +44,9 @@ class SettlementIntegrationTest @Autowired constructor(
         // 대출 실행(연 12%, 12개월)
         saga.execute(ExecuteLoanCommand(roundId, loanId, borrowerId, BigDecimal("12.0"), 12))
 
+        // platform:fee 는 전역 공유 계정이므로 이번 정산의 증분만 측정한다.
+        val feeBefore = ledger.balanceOf(AccountId("platform:fee"))
+
         // 1회차 정산 (이자 수수료 10%)
         val first = settle.settle(SettleRepaymentCommand(loanId, roundId, sequence = 1, feeRatePercent = BigDecimal("10")))
         assertTrue(first.applied)
@@ -57,12 +60,12 @@ class SettlementIntegrationTest @Autowired constructor(
 
         val balA = ledger.balanceOf(AccountId("investor:A"))
         val balB = ledger.balanceOf(AccountId("investor:B"))
-        val balFee = ledger.balanceOf(AccountId("platform:fee"))
+        val feeDelta = ledger.balanceOf(AccountId("platform:fee")) - feeBefore
 
-        assertEquals(expectedFee, balFee, "수수료 계정 잔액")
+        assertEquals(expectedFee, feeDelta, "이번 정산의 수수료")
         assertEquals(distributable, balA + balB, "투자자 분배 합 = 원금 + (이자 − 수수료)")
         // 돈의 보존: 투자자 분배 + 수수료 = 차주가 낸 원리금
-        assertEquals(installment.total, balA + balB + balFee)
+        assertEquals(installment.total, balA + balB + feeDelta)
         // 비율 6:4 → A가 B보다 많이 받음
         assertTrue(balA > balB, "6:4 비율이면 A가 더 많아야 한다")
     }
