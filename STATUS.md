@@ -2,7 +2,7 @@
 
 > 현재 어디까지 했고 다음에 무엇을 하는지. 결정의 *맥락*은 `docs/adr/`, *누적 기억*은 `MEMORY.md` 참고.
 
-**마지막 갱신**: 2026-06-18 (Phase C-4: CQRS)
+**마지막 갱신**: 2026-06-18 (Phase C 완료)
 
 ## 스냅샷
 
@@ -38,13 +38,13 @@
 - [x] Outbox 패턴(`modules/outbox`, 같은 tx 적재 + @Scheduled 릴레이, ADR-0009) (B2-2)
 - [x] 통합 테스트: 정상 실행 / 보상(롤백) / 멱등 재실행 (B2-2)
 
-### 🔄 Phase C — 정산 / EDA / CQRS (진행 중)
+### ✅ Phase C — 정산 / EDA / CQRS (완료)
 - [x] 정산(상환금 투자 비율 분배 + 수수료, 최대 잉여 방식, ADR-0010) (C-1)
 - [x] 개별 투자 내역 영속화(`investment` 테이블, Flyway V5) (C-1)
 - [x] ArchUnit 계층 의존 규칙 강제 테스트 (도메인 프레임워크 무의존 + adapter→application→domain) (C-2)
 - [x] Kafka 이벤트 발행/구독(`KafkaEventPublisher` @Primary + 컨슈머, 토픽 pfct.outbox, ADR-0011) (C-3)
 - [x] CQRS 읽기 모델(투자자 수익 — 정산 이벤트 구독 프로젝터, 읽기측 멱등, ADR-0012) (C-4)
-- [ ] README 아키텍처 다이어그램 + AI 활용 검증 사례 문서화 (C-5)
+- [x] README 아키텍처 다이어그램(mermaid) + 실행 가이드 + AI 활용 사례 + `docker-compose.yml` (C-5)
 
 ## 알려진 메모
 - 통합 테스트는 Docker 필요(모듈 단위 테스트는 불필요).
