@@ -1,5 +1,7 @@
 # pfct — 미니 P2P 대출·투자 플랫폼
 
+[![CI](https://github.com/MyoungSoo7/pfct/actions/workflows/ci.yml/badge.svg)](https://github.com/MyoungSoo7/pfct/actions/workflows/ci.yml)
+
 금융 도메인의 복잡함을 **정확하게** 코드로 풀어내는 것을 목표로 한 백엔드 포트폴리오입니다.
 투자 → 대출 실행 → 상환 → 정산으로 이어지는 자금의 일생을, 모든 이동을 **복식부기 원장**에 기록하며
 "돈이 한 푼도 생기거나 사라지지 않음"을 타입과 테스트로 보장합니다.

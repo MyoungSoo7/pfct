@@ -46,6 +46,10 @@
 - [x] CQRS 읽기 모델(투자자 수익 — 정산 이벤트 구독 프로젝터, 읽기측 멱등, ADR-0012) (C-4)
 - [x] README 아키텍처 다이어그램(mermaid) + 실행 가이드 + AI 활용 사례 + `docker-compose.yml` (C-5)
 
+## CI
+- GitHub Actions(`.github/workflows/ci.yml`): push/PR 시 `gradlew build`(통합 테스트 포함) 실행.
+  ubuntu 러너의 Docker 로 Testcontainers(Postgres/Kafka) 동작.
+
 ## 알려진 메모
 - 통합 테스트는 Docker 필요(모듈 단위 테스트는 불필요).
 - `docs/` 는 한때 `.gitignore`에 잡혀 있었음 → 제거함(ADR 추적 위해).
