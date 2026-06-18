@@ -27,7 +27,8 @@ Kotlin 1.9.25 · Java 21 · Spring Boot 3.5.15 · Gradle 8.14.5 · PostgreSQL ·
 | `modules/investment` | 펀딩/투자 — 오버펀딩 금지 불변식, 비관적 락 영속화 |
 | `modules/lending` | 여신/대출 — 원리금균등 상환 스케줄(이자 계산), 대출 영속화 |
 | `modules/outbox` | 트랜잭셔널 아웃박스 플랫폼(이벤트 적재 + 릴레이 발행) |
-| `bootstrap` | Spring Boot 조립, REST API, 대출 실행 Saga, 통합 테스트 |
+| `modules/settlement` | 정산 비율 분배기(최대 잉여 방식, 분배 합 보존) |
+| `bootstrap` | Spring Boot 조립, REST API, 대출 실행 Saga, 정산, 통합 테스트 |
 
 ## 빌드 & 테스트
 

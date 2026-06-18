@@ -18,6 +18,7 @@
 | [0007](0007-idempotent-append-only-ledger-writes.md) | 멱등한 append-only 원장 기록 | Accepted |
 | [0008](0008-orchestrated-saga-for-loan-execution.md) | 대출 실행은 오케스트레이션 Saga + 보상 | Accepted |
 | [0009](0009-transactional-outbox-for-event-publishing.md) | 이벤트 발행은 트랜잭셔널 아웃박스로 | Accepted |
+| [0010](0010-pro-rata-settlement-largest-remainder.md) | 상환금 정산은 최대 잉여 비율 분배 + 원장 기록 | Accepted |
 
 ## 새 ADR 추가 방법
 

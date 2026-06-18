@@ -18,6 +18,7 @@
 | 2026-06-18 | [0007](docs/adr/0007-idempotent-append-only-ledger-writes.md) | 원장은 append-only, 거래 ID를 멱등 키로(check-first + PK 백스톱), 잔액은 Σ분개로 도출 |
 | 2026-06-18 | [0008](docs/adr/0008-orchestrated-saga-for-loan-execution.md) | 대출 실행은 오케스트레이션 Saga(독립 트랜잭션 단계 + 역순 보상), 오케스트레이터는 컴포지션 루트에 |
 | 2026-06-18 | [0009](docs/adr/0009-transactional-outbox-for-event-publishing.md) | 이벤트는 트랜잭셔널 아웃박스(상태 변경과 같은 tx 적재 → 릴레이 발행, at-least-once) |
+| 2026-06-18 | [0010](docs/adr/0010-pro-rata-settlement-largest-remainder.md) | 정산은 개별 투자 내역 기반 최대 잉여 비율 분배(합 보존) + 이자 수수료 + 원장 기록(멱등) |
 
 ## 변하지 않는 규칙 (Conventions)
 
@@ -35,4 +36,5 @@
 - `modules/investment/` — 펀딩/투자 (도메인 + JPA 영속화 + 비관적 락)
 - `modules/lending/` — 여신/대출 + 원리금균등 상환 스케줄 + Loan 영속화
 - `modules/outbox/` — 트랜잭셔널 아웃박스 플랫폼(레코더 + 릴레이 + 퍼블리셔)
-- `bootstrap/` — Spring Boot 조립, REST, 대출 실행 Saga(`saga/`), 통합 테스트(Testcontainers)
+- `modules/settlement/` — 정산 비율 분배기(ProRataDistributor, 순수 도메인)
+- `bootstrap/` — Spring Boot 조립, REST, 대출 실행 Saga(`saga/`), 정산(`settlement/`), 통합 테스트(Testcontainers)

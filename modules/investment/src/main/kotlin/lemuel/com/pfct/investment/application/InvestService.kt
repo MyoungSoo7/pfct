@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class InvestService(
     private val repository: FundingRoundRepository,
+    private val investments: InvestmentRepository,
 ) {
     @Transactional
     fun invest(command: InvestCommand): InvestResult {
@@ -25,6 +26,8 @@ class InvestService(
 
         val events = round.invest(command.investorId, command.amount)
         repository.save(round)
+        // 정산을 위한 개별 투자 내역도 같은 트랜잭션으로 기록.
+        investments.save(command.roundId, command.investorId, command.amount)
 
         return InvestResult(
             roundId = command.roundId,
