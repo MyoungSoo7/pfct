@@ -19,6 +19,7 @@ dependencies {
     implementation(project(":modules:ledger"))
     implementation(project(":modules:investment"))
     implementation(project(":modules:lending"))
+    implementation(project(":modules:outbox"))
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")

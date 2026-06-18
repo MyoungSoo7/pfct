@@ -1,5 +1,5 @@
-// lending: 여신/대출 + 원리금균등 상환 스케줄.
-// domain 은 순수 코틀린, adapter 만 JPA 사용.
+// outbox: 트랜잭셔널 아웃박스 패턴 플랫폼 모듈.
+// 상태 변경과 같은 트랜잭션으로 이벤트를 저장하고, 릴레이가 비동기로 발행한다.
 plugins {
     kotlin("jvm")
     kotlin("plugin.spring")
@@ -20,7 +20,6 @@ dependencyManagement {
 }
 
 dependencies {
-    implementation(project(":common"))
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
     testImplementation(kotlin("test-junit5"))

@@ -2,7 +2,7 @@ package lemuel.com.pfct.investment.domain
 
 import lemuel.com.pfct.common.Money
 
-enum class FundingStatus { OPEN, FULFILLED, CANCELLED }
+enum class FundingStatus { OPEN, FULFILLED, EXECUTED, CANCELLED }
 
 /**
  * 펀딩 모집(Aggregate Root).
@@ -50,5 +50,25 @@ class FundingRound(
             events += FundingFulfilled(id, raised)
         }
         return events
+    }
+
+    /**
+     * 대출 실행을 확정한다(Saga 1단계). 모집된 자금이 차주에게 나갈 준비가 된 상태.
+     * **멱등**: 이미 EXECUTED 면 아무것도 바꾸지 않고 모집액을 반환한다(Saga 재실행 안전).
+     * @return 실행 원금(= 모집 완료액)
+     */
+    fun execute(): Money = when (status) {
+        FundingStatus.EXECUTED -> raised
+        FundingStatus.FULFILLED -> {
+            status = FundingStatus.EXECUTED
+            raised
+        }
+        else -> throw IllegalStateException("실행할 수 없는 상태입니다: $status (모집 완료 필요)")
+    }
+
+    /** 실행을 되돌린다(Saga 보상 트랜잭션). EXECUTED → FULFILLED. */
+    fun revertExecution() {
+        check(status == FundingStatus.EXECUTED) { "실행 상태가 아니어서 되돌릴 수 없습니다: $status" }
+        status = FundingStatus.FULFILLED
     }
 }

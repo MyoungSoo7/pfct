@@ -25,8 +25,9 @@ Kotlin 1.9.25 · Java 21 · Spring Boot 3.5.15 · Gradle 8.14.5 · PostgreSQL ·
 | `common` | Money, AnnualInterestRate, DomainEvent 등 금융 원시 타입 |
 | `modules/ledger` | 복식부기 원장(계정계) |
 | `modules/investment` | 펀딩/투자 — 오버펀딩 금지 불변식, 비관적 락 영속화 |
-| `modules/lending` | 여신/대출 — 원리금균등 상환 스케줄(이자 계산) |
-| `bootstrap` | Spring Boot 조립, REST API, 통합 테스트 |
+| `modules/lending` | 여신/대출 — 원리금균등 상환 스케줄(이자 계산), 대출 영속화 |
+| `modules/outbox` | 트랜잭셔널 아웃박스 플랫폼(이벤트 적재 + 릴레이 발행) |
+| `bootstrap` | Spring Boot 조립, REST API, 대출 실행 Saga, 통합 테스트 |
 
 ## 빌드 & 테스트
 
@@ -47,4 +48,5 @@ Kotlin 1.9.25 · Java 21 · Spring Boot 3.5.15 · Gradle 8.14.5 · PostgreSQL ·
 
 ## 진행 상태
 
-Phase A(도메인 코어)·Phase B1(투자 영속화 + 동시성 정합성) 완료. 상세는 [`STATUS.md`](STATUS.md) 참고.
+Phase A(도메인 코어)·B1(투자 영속화 + 동시성 정합성)·B2(원장·대출 실행 Saga·Outbox) 완료.
+상세는 [`STATUS.md`](STATUS.md) 참고.

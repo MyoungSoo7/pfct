@@ -16,6 +16,8 @@
 | [0005](0005-pessimistic-locking-for-funding-concurrency.md) | 펀딩 동시성에 비관적 락 사용 | Accepted |
 | [0006](0006-money-value-object-with-bigdecimal.md) | 금액은 BigDecimal 기반 Money VO로 | Accepted |
 | [0007](0007-idempotent-append-only-ledger-writes.md) | 멱등한 append-only 원장 기록 | Accepted |
+| [0008](0008-orchestrated-saga-for-loan-execution.md) | 대출 실행은 오케스트레이션 Saga + 보상 | Accepted |
+| [0009](0009-transactional-outbox-for-event-publishing.md) | 이벤트 발행은 트랜잭셔널 아웃박스로 | Accepted |
 
 ## 새 ADR 추가 방법
 
