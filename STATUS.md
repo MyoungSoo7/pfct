@@ -2,13 +2,14 @@
 
 > 현재 어디까지 했고 다음에 무엇을 하는지. 결정의 *맥락*은 `docs/adr/`, *누적 기억*은 `MEMORY.md` 참고.
 
-**마지막 갱신**: 2026-06-18 (Phase C-2: ArchUnit)
+**마지막 갱신**: 2026-06-18 (Phase C-3: Kafka EDA)
 
 ## 스냅샷
 
 - **빌드**: ✅ `gradlew build` GREEN
-- **테스트**: ✅ 통합 9개(동시성·원장×2·Saga×2·보상·정산×2·contextLoads)
-  + 단위(ProRataDistributor 6, 도메인 다수) + **ArchUnit 계층 규칙 3개**
+- **테스트**: ✅ 통합 10개(동시성·원장×2·Saga×2·보상·정산×2·**Kafka**·contextLoads)
+  + 단위(ProRataDistributor 6, 도메인 다수) + ArchUnit 계층 규칙 3개
+- **스택**: + Apache Kafka(Testcontainers `apache/kafka-native`)
 - **스택**: Kotlin 1.9.25 · Java 21 · Spring Boot 3.5.15 · PostgreSQL · Flyway · Testcontainers
 - **원격**: https://github.com/MyoungSoo7/pfct (master, public)
 
@@ -41,8 +42,8 @@
 - [x] 정산(상환금 투자 비율 분배 + 수수료, 최대 잉여 방식, ADR-0010) (C-1)
 - [x] 개별 투자 내역 영속화(`investment` 테이블, Flyway V5) (C-1)
 - [x] ArchUnit 계층 의존 규칙 강제 테스트 (도메인 프레임워크 무의존 + adapter→application→domain) (C-2)
-- [ ] Kafka 이벤트 발행/구독(`EventPublisher` Kafka 구현 + 컨슈머)
-- [ ] CQRS 읽기 모델(투자자 수익률 대시보드)
+- [x] Kafka 이벤트 발행/구독(`KafkaEventPublisher` @Primary + 컨슈머, 토픽 pfct.outbox, ADR-0011) (C-3)
+- [ ] CQRS 읽기 모델(투자자 수익률 대시보드 — Kafka 컨슈머가 갱신)
 - [ ] README 아키텍처 다이어그램 + AI 활용 검증 사례 문서화
 
 ## 알려진 메모
