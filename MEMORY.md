@@ -21,6 +21,7 @@
 | 2026-06-18 | [0010](docs/adr/0010-pro-rata-settlement-largest-remainder.md) | 정산은 개별 투자 내역 기반 최대 잉여 비율 분배(합 보존) + 이자 수수료 + 원장 기록(멱등) |
 | 2026-06-18 | [0011](docs/adr/0011-kafka-as-event-transport.md) | 이벤트 전송은 Kafka(KafkaEventPublisher @Primary, 토픽 pfct.outbox, 키=aggregateId, at-least-once) |
 | 2026-06-18 | [0012](docs/adr/0012-cqrs-read-model-via-events.md) | 투자자 수익은 CQRS 읽기 모델(정산 이벤트 → 프로젝터 → investor_return_view, processed_event로 멱등) |
+| 2026-06-20 | [0013](docs/adr/0013-delinquency-and-overdue-scanning.md) | 연체는 상태 있는 상환 회차(loan_repayment, DUE/PAID/OVERDUE)로 영속화 + 주기 스캔(@Scheduled, 회차당 독립 tx)으로 OVERDUE 전이·연체료(정수 연산, 절사) + RepaymentOverdue 아웃박스 이벤트 |
 
 ## 변하지 않는 규칙 (Conventions)
 
@@ -36,7 +37,7 @@
 - `common/` — Money, AnnualInterestRate, DomainEvent
 - `modules/ledger/` — 복식부기 원장(계정계)
 - `modules/investment/` — 펀딩/투자 (도메인 + JPA 영속화 + 비관적 락)
-- `modules/lending/` — 여신/대출 + 원리금균등 상환 스케줄 + Loan 영속화
+- `modules/lending/` — 여신/대출 + 원리금균등 상환 스케줄 + Loan 영속화 + 상태 있는 상환 회차(`ScheduledRepayment`, `DelinquencyCalculator`)
 - `modules/outbox/` — 트랜잭셔널 아웃박스 플랫폼(레코더 + 릴레이 + 퍼블리셔)
 - `modules/settlement/` — 정산 비율 분배기(ProRataDistributor, 순수 도메인)
-- `bootstrap/` — Spring Boot 조립, REST, 대출 실행 Saga(`saga/`), 정산(`settlement/`), 통합 테스트(Testcontainers)
+- `bootstrap/` — Spring Boot 조립, REST, 대출 실행 Saga(`saga/`), 정산(`settlement/`), 연체 스캔(`overdue/`), 통합 테스트(Testcontainers)

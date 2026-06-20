@@ -2,13 +2,13 @@
 
 > 현재 어디까지 했고 다음에 무엇을 하는지. 결정의 *맥락*은 `docs/adr/`, *누적 기억*은 `MEMORY.md` 참고.
 
-**마지막 갱신**: 2026-06-18 (Phase C 완료)
+**마지막 갱신**: 2026-06-20 (Phase D 완료)
 
 ## 스냅샷
 
-- **빌드**: ✅ `gradlew build` GREEN
-- **테스트**: ✅ 통합 13개(동시성·원장×2·Saga×2·보상·정산×2·Kafka·**CQRS×2**·contextLoads)
-  + 단위(ProRataDistributor 6, 도메인 다수) + ArchUnit 계층 규칙 3개
+- **빌드**: ✅ `gradlew build` GREEN (전체 통합 테스트 포함, 2026-06-20 확인)
+- **테스트**: ✅ 통합 14개(동시성·원장×2·Saga×2·보상·정산×2·Kafka·**CQRS×2**·**연체×1**·contextLoads)
+  + 단위(ProRataDistributor 6, **연체료/회차전이 6**, 도메인 다수) + ArchUnit 계층 규칙 3개
 - **스택**: PostgreSQL · Apache Kafka · Flyway · JPA · Testcontainers (모두 Testcontainers로 검증)
 - **스택**: Kotlin 1.9.25 · Java 21 · Spring Boot 3.5.15 · PostgreSQL · Flyway · Testcontainers
 - **원격**: https://github.com/MyoungSoo7/pfct (master, public)
@@ -45,6 +45,17 @@
 - [x] Kafka 이벤트 발행/구독(`KafkaEventPublisher` @Primary + 컨슈머, 토픽 pfct.outbox, ADR-0011) (C-3)
 - [x] CQRS 읽기 모델(투자자 수익 — 정산 이벤트 구독 프로젝터, 읽기측 멱등, ADR-0012) (C-4)
 - [x] README 아키텍처 다이어그램(mermaid) + 실행 가이드 + AI 활용 사례 + `docker-compose.yml` (C-5)
+
+### ✅ Phase D — 연체 / 상환 스케줄 (완료)
+- [x] 상태 있는 상환 회차(`ScheduledRepayment`: DUE/PAID/OVERDUE) + `loan_repayment` 테이블(Flyway V7) (D-1)
+- [x] 대출 실행 시 상환 스케줄 영속화(`CreateLoanService`, 회차 N 납기 = 기준일+N개월) (D-1)
+- [x] 정산 시 해당 회차 PAID 전이(`SettleRepaymentService`, applied=true일 때만) (D-1)
+- [x] 연체료 계산기(`DelinquencyCalculator`: 원리금×연체이자율×일수/365, 원 단위 절사, 순수 도메인) (D-2)
+- [x] 연체 스캐너(`OverdueScanner` @Scheduled) + 회차당 독립 tx 처리(`OverdueProcessingService`) (D-2)
+- [x] 연체 전이 + `RepaymentOverdue` 아웃박스 이벤트 같은 tx(트랜잭셔널 아웃박스) (D-2)
+- [x] 상환/연체 조회 API(`GET /api/loans/{id}/repayments`) (D-2)
+- [x] 단위 테스트(`DelinquencyTest`) + 통합 테스트(`OverdueIntegrationTest`: 스캔→전이→연체료) GREEN (D-2)
+- [x] ADR-0013 + 인덱스/MEMORY/STATUS 갱신 (결정 기록 프로토콜)
 
 ## CI
 - GitHub Actions(`.github/workflows/ci.yml`): push/PR 시 `gradlew build`(통합 테스트 포함) 실행.

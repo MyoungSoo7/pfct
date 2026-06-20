@@ -57,7 +57,7 @@ PostgreSQL · Apache Kafka · Flyway · JPA/Hibernate · Testcontainers · ArchU
 | `common` | Money, AnnualInterestRate, DomainEvent 등 금융 원시 타입(프레임워크 0 의존) |
 | `modules/ledger` | 복식부기 원장(계정계) |
 | `modules/investment` | 펀딩/투자 — 오버펀딩 금지 불변식, 비관적 락, 개별 투자 내역 |
-| `modules/lending` | 여신/대출 — 원리금균등 상환 스케줄(이자 계산) |
+| `modules/lending` | 여신/대출 — 원리금균등 상환 스케줄, 상태 있는 상환 회차, 연체료 계산 |
 | `modules/settlement` | 정산 비율 분배기(최대 잉여 방식, 분배 합 보존) |
 | `modules/outbox` | 트랜잭셔널 아웃박스 플랫폼(레코더 + 릴레이 + Kafka 발행) |
 | `bootstrap` | Spring Boot 조립, REST API, 대출 실행 Saga, 정산, CQRS 프로젝터 |
@@ -100,6 +100,7 @@ docker compose up -d
 | `POST` | `/api/loans/execute` | 대출 실행(Saga) |
 | `POST` | `/api/loans/{loanId}/settlements` | 상환 정산(비율 분배 + 수수료) |
 | `GET`  | `/api/investors/{id}/returns` | 투자자 수익 조회(CQRS 읽기 모델) |
+| `GET`  | `/api/loans/{loanId}/repayments` | 상환 스케줄·연체 상태 조회(회차별 status·연체료) |
 
 ## 테스트 전략
 
@@ -130,5 +131,6 @@ docker compose up -d
 
 ## 진행 상태
 
-Phase A(도메인 코어) · B(투자 영속화·동시성·대출 실행 Saga·아웃박스) · C(정산·ArchUnit·Kafka·CQRS) 완료.
-상세는 [`STATUS.md`](STATUS.md) 참고.
+Phase A(도메인 코어) · B(투자 영속화·동시성·대출 실행 Saga·아웃박스) · C(정산·ArchUnit·Kafka·CQRS) ·
+D(연체·상환 스케줄: 상태 있는 상환 회차·연체료·주기 스캔) 완료.
+상세는 [`STATUS.md`](STATUS.md), 전체 명세는 [`docs/specification.md`](docs/specification.md) 참고.
