@@ -23,6 +23,7 @@ class LoanController(
                 borrowerId = request.borrowerId,
                 annualRatePercent = request.annualRatePercent,
                 months = request.months,
+                startDate = request.startDate ?: java.time.LocalDate.now(),
             ),
         )
         return ExecuteLoanResponse(
@@ -38,6 +39,7 @@ data class ExecuteLoanRequest(
     val borrowerId: String,
     val annualRatePercent: BigDecimal,
     val months: Int,
+    val startDate: java.time.LocalDate? = null,
 )
 
 data class ExecuteLoanResponse(

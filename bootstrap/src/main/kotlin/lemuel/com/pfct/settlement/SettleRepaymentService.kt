@@ -12,6 +12,7 @@ import lemuel.com.pfct.ledger.domain.TransactionId
 import com.fasterxml.jackson.databind.ObjectMapper
 import lemuel.com.pfct.event.InvestorDistribution
 import lemuel.com.pfct.event.RepaymentSettledEvent
+import lemuel.com.pfct.lending.application.LoanRepaymentRepository
 import lemuel.com.pfct.lending.application.LoanRepository
 import lemuel.com.pfct.lending.domain.LoanId
 import lemuel.com.pfct.outbox.OutboxRecorder
@@ -36,6 +37,7 @@ class SettleRepaymentService(
     private val loans: LoanRepository,
     private val investments: InvestmentRepository,
     private val ledger: RecordLedgerTransactionService,
+    private val repayments: LoanRepaymentRepository,
     private val outbox: OutboxRecorder,
     private val objectMapper: ObjectMapper,
 ) {
@@ -75,8 +77,12 @@ class SettleRepaymentService(
             ),
         )
 
-        // 실제 반영된 경우에만 정산 이벤트를 아웃박스에 적재(원장 기록과 같은 트랜잭션) → CQRS 읽기 모델 갱신 트리거.
+        // 실제 반영된 경우에만 해당 회차를 PAID 로 전이하고(연체 대상에서 제외) 정산 이벤트를 아웃박스에 적재.
         if (result.applied) {
+            repayments.findByLoanIdAndSequence(LoanId(command.loanId), command.sequence)?.let { entry ->
+                entry.markPaid()
+                repayments.update(entry)
+            }
             val event = RepaymentSettledEvent(
                 settlementId = settlementId,
                 loanId = command.loanId,

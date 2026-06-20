@@ -46,6 +46,7 @@ class LoanExecutionSaga(
                     principal = principal,
                     annualRate = AnnualInterestRate(command.annualRatePercent),
                     months = command.months,
+                    startDate = command.startDate,
                 ),
             )
         } catch (e: RuntimeException) {
@@ -74,6 +75,7 @@ data class ExecuteLoanCommand(
     val borrowerId: String,
     val annualRatePercent: BigDecimal,
     val months: Int,
+    val startDate: java.time.LocalDate = java.time.LocalDate.now(),
 )
 
 data class LoanExecutionResult(
