@@ -14,4 +14,11 @@ class KafkaTopicConfig {
             .partitions(1)
             .replicas(1)
             .build()
+
+    @Bean
+    fun outboxDlqTopic(): NewTopic =
+        TopicBuilder.name(KafkaDeadLetterPublisher.TOPIC)
+            .partitions(1)
+            .replicas(1)
+            .build()
 }

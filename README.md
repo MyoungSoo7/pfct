@@ -41,6 +41,8 @@ flowchart LR
 | 이중 쓰기 | 트랜잭셔널 아웃박스 | [0009](docs/adr/0009-transactional-outbox-for-event-publishing.md) |
 | EDA | Kafka(키=aggregateId, at-least-once) | [0011](docs/adr/0011-kafka-as-event-transport.md) |
 | 조회 | 이벤트 기반 CQRS 읽기 모델 | [0012](docs/adr/0012-cqrs-read-model-via-events.md) |
+| 발행 복원력 | 백오프 재시도 + 한도 초과 시 DLQ 격리 | [0014](docs/adr/0014-outbox-retry-backoff-and-dlq.md) |
+| 수평 확장 | 릴레이 `FOR UPDATE SKIP LOCKED`(멀티 인스턴스 안전) | [0015](docs/adr/0015-skip-locked-multi-instance-outbox-relay.md) |
 
 ## 기술 스택
 
@@ -59,8 +61,8 @@ PostgreSQL · Apache Kafka · Flyway · JPA/Hibernate · Testcontainers · ArchU
 | `modules/investment` | 펀딩/투자 — 오버펀딩 금지 불변식, 비관적 락, 개별 투자 내역 |
 | `modules/lending` | 여신/대출 — 원리금균등 상환 스케줄, 상태 있는 상환 회차, 연체료 계산 |
 | `modules/settlement` | 정산 비율 분배기(최대 잉여 방식, 분배 합 보존) |
-| `modules/outbox` | 트랜잭셔널 아웃박스 플랫폼(레코더 + 릴레이 + Kafka 발행) |
-| `bootstrap` | Spring Boot 조립, REST API, 대출 실행 Saga, 정산, CQRS 프로젝터 |
+| `modules/outbox` | 트랜잭셔널 아웃박스 플랫폼(레코더 + 릴레이[백오프 재시도·DLQ·SKIP LOCKED] + Kafka 발행/데드레터) |
+| `bootstrap` | Spring Boot 조립, REST API, 대출 실행 Saga, 정산, CQRS 프로젝터, DLQ 운영 조회 |
 
 ## 실행 방법
 
@@ -132,5 +134,6 @@ docker compose up -d
 ## 진행 상태
 
 Phase A(도메인 코어) · B(투자 영속화·동시성·대출 실행 Saga·아웃박스) · C(정산·ArchUnit·Kafka·CQRS) ·
-D(연체·상환 스케줄: 상태 있는 상환 회차·연체료·주기 스캔) 완료.
+D(연체·상환 스케줄: 상태 있는 상환 회차·연체료·주기 스캔) ·
+E(아웃박스 복원력: 백오프 재시도·DLQ 격리·SKIP LOCKED 멀티인스턴스 릴레이) 완료.
 상세는 [`STATUS.md`](STATUS.md), 전체 명세는 [`docs/specification.md`](docs/specification.md) 참고.

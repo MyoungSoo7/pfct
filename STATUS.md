@@ -2,12 +2,12 @@
 
 > 현재 어디까지 했고 다음에 무엇을 하는지. 결정의 *맥락*은 `docs/adr/`, *누적 기억*은 `MEMORY.md` 참고.
 
-**마지막 갱신**: 2026-06-20 (Phase D 완료)
+**마지막 갱신**: 2026-06-20 (Phase E2 완료 — SKIP LOCKED 멀티인스턴스 릴레이)
 
 ## 스냅샷
 
 - **빌드**: ✅ `gradlew build` GREEN (전체 통합 테스트 포함, 2026-06-20 확인)
-- **테스트**: ✅ 통합 14개(동시성·원장×2·Saga×2·보상·정산×2·Kafka·**CQRS×2**·**연체×1**·contextLoads)
+- **테스트**: ✅ 통합 16개(동시성·원장×2·Saga×2·보상·정산×2·Kafka·**CQRS×2**·**연체×1**·**아웃박스 DLQ×2**·**릴레이 동시성×1**·contextLoads)
   + 단위(ProRataDistributor 6, **연체료/회차전이 6**, 도메인 다수) + ArchUnit 계층 규칙 3개
 - **스택**: PostgreSQL · Apache Kafka · Flyway · JPA · Testcontainers (모두 Testcontainers로 검증)
 - **스택**: Kotlin 1.9.25 · Java 21 · Spring Boot 3.5.15 · PostgreSQL · Flyway · Testcontainers
@@ -56,6 +56,21 @@
 - [x] 상환/연체 조회 API(`GET /api/loans/{id}/repayments`) (D-2)
 - [x] 단위 테스트(`DelinquencyTest`) + 통합 테스트(`OverdueIntegrationTest`: 스캔→전이→연체료) GREEN (D-2)
 - [x] ADR-0013 + 인덱스/MEMORY/STATUS 갱신 (결정 기록 프로토콜)
+
+### ✅ Phase E1 — 아웃박스 재시도/백오프 + DLQ (완료)
+- [x] 아웃박스 컬럼 추가(`attempts`/`next_attempt_at`/`last_error`/`dead`, Flyway V8 + 부분 인덱스)
+- [x] 릴레이 이벤트 단위 처리 — 한 건 실패가 같은 배치의 성공 건을 롤백하지 않음(머리 막힘 제거)
+- [x] 지수 백오프 재시도(`next_attempt_at = now + base×2^(n-1)`, 상한) + 발행 후보 쿼리 `findReadyForPublish`
+- [x] 한도 초과 시 DLQ 격리(`dead`=권위 기록) + `DeadLetterPublisher`(`pfct.outbox.dlq` 토픽=부가)
+- [x] 운영 조회 API `GET /api/admin/outbox/dead`
+- [x] 결정성 통합 테스트(`OutboxDlqIntegrationTest`: 백오프 게이팅→격리, 재시도 중 복구) GREEN
+- [x] ADR-0014 + 인덱스/MEMORY/STATUS 갱신
+
+### ✅ Phase E2 — SKIP LOCKED 멀티인스턴스 릴레이 (완료)
+- [x] 발행 후보 조회 `findReadyForPublish` 에 `@Lock(PESSIMISTIC_WRITE)` + `lock.timeout=-2`(=`SKIP LOCKED`)
+- [x] 여러 릴레이 인스턴스가 disjoint 배치를 가져가 중복 발행/경합 제거(select→발행→갱신이 한 tx)
+- [x] 동시성 통합 테스트(`OutboxRelayConcurrencyTest`: 워커 6개 동시 폴링 → 각 이벤트 정확히 1회 발행) GREEN
+- [x] ADR-0015 + 인덱스/MEMORY/STATUS 갱신
 
 ## CI
 - GitHub Actions(`.github/workflows/ci.yml`): push/PR 시 `gradlew build`(통합 테스트 포함) 실행.
